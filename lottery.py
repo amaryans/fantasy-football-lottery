@@ -12,7 +12,7 @@ class LotterySim():
         self.sim = Simulator(self.n_picks, self.n_balls, self.chances)
 
     def runSampleSim(self):
-        iters = 10000
+        iters = 100
         lottery_simulation = np.array([self.sim.play_lottery() for _ in range(iters)])
         df = pd.DataFrame({'seeds': np.array(self.sim.seeds) + 1, 'chances': self.chances}).set_index('seeds')
 

@@ -30,7 +30,17 @@ class StandingsWidget(QWidget):
 
     def _setup_ui(self):
         """Initialize and configure the standings UI elements."""
+        # Create container with outer border
+        container = QWidget()
+        container.setStyleSheet("""
+            background-color: white;
+            border: 2px solid #013369;
+            border-radius: 10px;
+        """)
+
         layout = QVBoxLayout()
+        layout.setSpacing(0)  # Remove spacing between rows
+        layout.setContentsMargins(0, 0, 0, 0)  # Remove margins
 
         if not len(self.standings_data):
             # Show error message if no data
@@ -42,13 +52,20 @@ class StandingsWidget(QWidget):
                 row_widget = self._create_standings_row(
                     self.standings_data[i][0],
                     self.standings_data[i][1],
-                    self.standings_data[i][2]
+                    self.standings_data[i][2],
+                    is_first=(i == 0),
+                    is_last=(i == min(NUMBER_OF_TEAMS, len(self.standings_data) - 1))
                 )
                 layout.addWidget(row_widget)
 
-        self.setLayout(layout)
+        container.setLayout(layout)
 
-    def _create_standings_row(self, owner, team, record):
+        # Wrapper layout
+        wrapper_layout = QVBoxLayout()
+        wrapper_layout.addWidget(container)
+        self.setLayout(wrapper_layout)
+
+    def _create_standings_row(self, owner, team, record, is_first=False, is_last=False):
         """
         Create a single row for the standings table.
 
@@ -56,26 +73,60 @@ class StandingsWidget(QWidget):
             owner: Owner name
             team: Team name
             record: Win-loss record
+            is_first: True if this is the first row (header)
+            is_last: True if this is the last row
 
         Returns:
             QWidget containing the row
         """
         row_widget = QWidget()
-        row_widget.setStyleSheet(STANDINGS_ROW)
+
+        # Style with thin bottom border between rows, no rounding
+        if is_last:
+            border_style = "border: none;"
+        else:
+            border_style = "border: none; border-bottom: 1px solid #013369;"
+
+        row_widget.setStyleSheet(f"""
+            background-color: white;
+            {border_style}
+            padding: 8px;
+            border-radius: 0px;
+        """)
+
         row_layout = QHBoxLayout()
+        row_layout.setSpacing(10)
+        row_layout.setContentsMargins(5, 0, 5, 0)
         row_widget.setLayout(row_layout)
 
         # Owner label
         owner_label = QLabel(str(owner))
-        owner_label.setStyleSheet(OWNER_LABEL)
+        owner_label.setStyleSheet("""
+            font: bold 14px;
+            min-width: 5em;
+            max-width: 5em;
+            border: none;
+            background: transparent;
+        """)
 
         # Team label
         team_label = QLabel(str(team))
-        team_label.setStyleSheet(TEAM_LABEL)
+        team_label.setStyleSheet("""
+            font: bold 14px;
+            min-width: 8em;
+            border: none;
+            background: transparent;
+        """)
 
         # Record label
         record_label = QLabel(str(record))
-        record_label.setStyleSheet(WIN_LOSS_LABEL)
+        record_label.setStyleSheet("""
+            font: bold 14px;
+            min-width: 5em;
+            max-width: 5em;
+            border: none;
+            background: transparent;
+        """)
 
         # Add to row layout
         row_layout.addWidget(owner_label)

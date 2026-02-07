@@ -57,6 +57,7 @@ class MainWindow(QMainWindow):
         selection_layout.addWidget(self.standings_widget)
         selection_layout.addWidget(self.lottery_window_widget, 1)
         selection_layout.addWidget(self.draft_pick_selector_widget)
+        selection_layout.setContentsMargins(0, 0, 0, 0)
 
         # Add all widgets to main layout
         main_layout.addWidget(self.header_widget)
