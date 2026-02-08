@@ -4,7 +4,7 @@ Displays the top row showing the current draft order.
 """
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QFrame, QHBoxLayout, QLabel, QSizePolicy, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import QFrame, QHBoxLayout, QLabel, QSizePolicy, QVBoxLayout, QWidget, QLayout
 
 from config.constants import NUMBER_OF_TEAMS
 from config.styles import DRAFT_ORDER_BUTTON, LOTTERY_WINDOW_BACKGROUND
@@ -25,12 +25,9 @@ class DraftPickBox(QWidget):
             background-color: white;
             border: 1px solid #013369;
             font: bold 12px;
+            max-height: 8em;
             padding: 5px;
         """
-        #self.setStyleSheet(box_style)
-        
-        main_layout = QHBoxLayout()
-
         container_widget = QWidget()
         container_widget.setStyleSheet(box_style)
 
@@ -40,23 +37,22 @@ class DraftPickBox(QWidget):
         layout.setSpacing(0)
         container_widget.setLayout(layout)
 
-        # Header with pick number (20% of height)
+        # Header with pick number
         header_label = QLabel(str(self.pick_number))
         header_label.setAlignment(Qt.AlignCenter)
-        header_label.setStyleSheet("font: bold 12px; background-color: transparent; border-bottom: 3px solid #013369; min-height:2em")
+        header_label.setStyleSheet("font: bold 12px; background-color: white; border-bottom: 3px solid #013369; min-height:2em")
         header_label.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Maximum)
 
-        # Content area for owner name (remaining 80%)
+        # Content area for owner name
         self.content_label = QLabel()
         self.content_label.setAlignment(Qt.AlignCenter)
-        self.content_label.setStyleSheet("font: bold 12px; background-color: transparent; border: none; min-height:2em;")
-        self.content_label.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Maximum)
-
+        self.content_label.setStyleSheet("font: bold 12px; background-color: white; border: none; min-height:2em; max-height:8em")
+        self.content_label.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Minimum)
+        layout.addStretch()
         layout.addWidget(header_label, 20)  # 20% stretch factor
         layout.addWidget(self.content_label, 80)  # 80% stretch factor
         layout.addStretch()
-        main_layout.addWidget(container_widget)
-        self.setLayout(main_layout)
+        self.setLayout(layout)
 
     def set_owner(self, owner_name):
         """Set the owner name in the content area."""
@@ -75,8 +71,8 @@ class DraftOrderWidget(QWidget):
         """Initialize and configure the draft order UI elements."""
         # Set height constraints on the widget itself to ensure it's visible
         layout = QHBoxLayout()
-        layout.setSpacing(0)  # Small spacing between picks
-        layout.setContentsMargins(0, 0, 0, 0)  # Remove margins
+        layout.setSpacing(8)  # Small spacing between picks
+        layout.setContentsMargins(8, 0, 8, 0)  # Remove margins
 
         # Create pick box for each draft pick
         for i in range(NUMBER_OF_TEAMS):

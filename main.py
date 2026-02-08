@@ -29,7 +29,7 @@ class MainWindow(QMainWindow):
 
         # Setup window
         self.setWindowTitle("West KTown Fantasy Football Lottery")
-        self.setGeometry(100, 100, 1920, 1080)
+        self.setGeometry(100, 100, 1920, 800)
 
         # Initialize UI
         self._setup_ui()
@@ -78,6 +78,7 @@ class MainWindow(QMainWindow):
             # Enable draft pick selector
             self.draft_pick_selector_widget.start_draft()
             self.draft_pick_selector_widget.set_current_owner(current_owner)
+            self.draft_pick_selector_widget.enable_selection()
 
             # Increment pick number
             self.pick_number += 1

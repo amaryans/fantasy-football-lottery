@@ -31,6 +31,7 @@ class DraftPickSelectorWidget(QWidget):
         self.selected_button = None
         self.is_draft_begun = False
         self.current_owner = None
+        self.can_make_selection = False  # Tracks if user can make a new selection
         self._setup_ui()
 
     def _setup_ui(self):
@@ -88,7 +89,7 @@ class DraftPickSelectorWidget(QWidget):
         if self.selected_button:
             self.selected_button.setStyleSheet(DRAFT_PICK_SELECTOR)
 
-        if self.is_draft_begun:
+        if self.is_draft_begun and self.can_make_selection:
             # Update selection
             self.selected_position = position
             self.selected_button = self.pick_buttons[position]
@@ -116,6 +117,9 @@ class DraftPickSelectorWidget(QWidget):
             self.selected_button = None
             self.selected_position = None
 
+            # Prevent further selections until next pick
+            self.can_make_selection = False
+
     def _on_undo_clicked(self):
         """Handle undo button click."""
         if self.is_draft_begun and self.selected_button:
@@ -142,6 +146,10 @@ class DraftPickSelectorWidget(QWidget):
             owner_name: Name of the current owner
         """
         self.current_owner = owner_name
+
+    def enable_selection(self):
+        """Enable the user to make a new selection."""
+        self.can_make_selection = True
 
     def enable_confirm_cancel(self, enabled):
         """
