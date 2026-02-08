@@ -7,7 +7,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QFrame, QHBoxLayout, QLabel, QSizePolicy, QVBoxLayout, QWidget, QLayout
 
 from config.config_manager import config
-from config.styles import DRAFT_ORDER_BUTTON, LOTTERY_WINDOW_BACKGROUND
+from config.styles import DRAFT_PICK_BOX, DRAFT_PICK_HEADER, DRAFT_PICK_CONTENT
 
 class DraftPickBox(QWidget):
     """Custom widget for a single draft pick box with header and divider."""
@@ -21,15 +21,8 @@ class DraftPickBox(QWidget):
     def _setup_ui(self):
         """Initialize and configure the pick box UI elements."""
         # Apply the main box styling (override padding to 0 since we manage layout internally)
-        box_style = """
-            background-color: white;
-            border: 1px solid #013369;
-            font: bold 12px;
-            max-height: 8em;
-            padding: 5px;
-        """
         container_widget = QWidget()
-        container_widget.setStyleSheet(box_style)
+        container_widget.setStyleSheet(DRAFT_PICK_BOX)
 
         # Create vertical layout for header, line, and content
         layout = QVBoxLayout()
@@ -40,13 +33,13 @@ class DraftPickBox(QWidget):
         # Header with pick number
         header_label = QLabel(str(self.pick_number))
         header_label.setAlignment(Qt.AlignCenter)
-        header_label.setStyleSheet("font: bold 12px; background-color: white; border-bottom: 3px solid #013369; min-height:2em")
+        header_label.setStyleSheet(DRAFT_PICK_HEADER)
         header_label.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Maximum)
 
         # Content area for owner name
         self.content_label = QLabel()
         self.content_label.setAlignment(Qt.AlignCenter)
-        self.content_label.setStyleSheet("font: bold 12px; background-color: white; border: none; min-height:2em; max-height:8em")
+        self.content_label.setStyleSheet(DRAFT_PICK_CONTENT)
         self.content_label.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Minimum)
         layout.addStretch()
         layout.addWidget(header_label, 20)  # 20% stretch factor

@@ -5,7 +5,7 @@ Stylesheet constants for the Fantasy Football Lottery application.
 DRAFT_ORDER_BUTTON = """
         background-color: white;
         border: 1px solid #013369;
-        font: bold 12px;
+        font: bold 18px;
         min-width: 10em;
         min-height: 10em;
         max-height: 10em;
@@ -18,7 +18,7 @@ DRAFT_PICK_SELECTOR = """
         border-style: outset;
         border-width: 2px;
         border-color: #013369;
-        font: bold 12px;
+        font: bold 18px;
         min-width: 10em;
         max-width: 20em;
         max-height: 10em;
@@ -36,7 +36,7 @@ DRAFT_PICK_SELECTOR_HIGHLIGHTED = """
         border-style: outset;
         border-width: 2px;
         border-color: #D50A0A;
-        font: bold 12px;
+        font: bold 18px;
         min-width: 10em;
         max-width: 20em;
         max-height: 10em;
@@ -54,7 +54,7 @@ DRAFT_PICK_SELECTOR_DISABLED = """
         border-style: outset;
         border-width: 2px;
         border-color: #013369;
-        font: bold 12px;
+        font: bold 18px;
         min-width: 10em;
         max-width: 20em;
         max-height: 10em;
@@ -70,7 +70,7 @@ STANDINGS_ROW = """background-color: white;
     border-width: 2px;
     border-radius: 10px;
     border-color: #013369;
-    font: bold 14px;
+    font: bold 18px;
     min-width: 8em;
     max-height: 10em;
     padding: 6px;
@@ -81,7 +81,7 @@ OWNER_LABEL = """background-color: white;
     border-width: 2px;
     border-radius: 10px;
     border-color: #013369;
-    font: bold 14px;
+    font: bold 18px;
     min-width: 5em;
     max-width: 5em;
     max-height: 10em;
@@ -93,7 +93,7 @@ TEAM_LABEL = """background-color: white;
     border-width: 2px;
     border-radius: 10px;
     border-color: #013369;
-    font: bold 14px;
+    font: bold 18px;
     min-width: 5em;
     max-height: 10em;
     padding: 6px;
@@ -104,7 +104,7 @@ WIN_LOSS_LABEL = """background-color: white;
     border-width: 2px;
     border-radius: 10px;
     border-color: #013369;
-    font: bold 14px;
+    font: bold 18px;
     min-width: 5em;
     max-width: 5em;
     max-height: 10em;
@@ -120,14 +120,14 @@ HEADER = """font: bold 24px;
 
 LOTTERY_WINDOW_BACKGROUND = """background-color: white;
     border-style: outset;
-    font: bold 14px;
+    font: bold 24px;
     min-width: 20em;
     padding: 6px;
 """
 
 LOTTERY_WINDOW_HEADER = """background-color: white;
     border-style: outset;
-    font: bold 14px;
+    font: bold 24px;
     min-width: 20em;
     max-height: 10em;
 """
@@ -138,7 +138,7 @@ NEXT_PICK_BUTTON = """
         border-style: outset;
         border-width: 2px;
         border-color: #013369;
-        font: bold 12px;
+        font: bold 18px;
         min-width: 10em;
         max-width: 20em;
         min-height: 5em;
@@ -152,4 +152,81 @@ NEXT_PICK_BUTTON = """
         background-color: #F0F0F0;
         color: #999999;
     }
+"""
+
+# Configuration Widget Styles
+CONFIG_SAVE_BUTTON = """
+    background-color: #4CAF50;
+    color: white;
+    font-weight: bold;
+    padding: 10px;
+"""
+
+# Standings Widget Styles
+STANDINGS_CONTAINER = """
+    background-color: white;
+    border: 2px solid #013369;
+    border-radius: 10px;
+"""
+
+STANDINGS_ROW_NORMAL = """
+    background-color: white;
+    border: none;
+    border-bottom: 1px solid #013369;
+    padding: 8px;
+    border-radius: 0px;
+"""
+
+STANDINGS_ROW_LAST = """
+    background-color: white;
+    border: none;
+    padding: 8px;
+    border-radius: 0px;
+"""
+
+STANDINGS_OWNER_LABEL = """
+    font: bold 18px;
+    min-width: 5em;
+    max-width: 5em;
+    border: none;
+    background: transparent;
+"""
+
+STANDINGS_TEAM_LABEL = """
+    font: bold 18px;
+    min-width: 8em;
+    border: none;
+    background: transparent;
+"""
+
+STANDINGS_RECORD_LABEL = """
+    font: bold 18px;
+    min-width: 5em;
+    max-width: 5em;
+    border: none;
+    background: transparent;
+"""
+
+# Draft Pick Box Styles
+DRAFT_PICK_BOX = """
+    background-color: white;
+    border: 1px solid #013369;
+    font: bold 18px;
+    max-height: 8em;
+    padding: 5px;
+"""
+
+DRAFT_PICK_HEADER = """
+    font: bold 18px;
+    background-color: white;
+    border-bottom: 3px solid #013369;
+    min-height: 2em;
+"""
+
+DRAFT_PICK_CONTENT = """
+    font: bold 18px;
+    background-color: white;
+    border: none;
+    min-height: 3em;
+    max-height: 8em;
 """

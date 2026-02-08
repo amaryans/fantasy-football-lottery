@@ -30,7 +30,7 @@ class MainWindow(QMainWindow):
 
         # Setup window
         self.setWindowTitle("West KTown Fantasy Football Lottery")
-        self.setGeometry(100, 100, 1920, 800)
+        self.setGeometry(100, 100, 1920, 1080)
 
         # Initialize configuration widget
         self.config_widget = None
@@ -95,9 +95,9 @@ class MainWindow(QMainWindow):
 
         # Add all widgets to main layout
         main_layout.addWidget(self.header_widget)
-        main_layout.addWidget(self.draft_order_widget)
-        main_layout.addLayout(selection_layout)
-
+        main_layout.addWidget(self.draft_order_widget, 1)
+        main_layout.addLayout(selection_layout, 8)
+        # main_layout.addStretch()
         self.setCentralWidget(main_widget)
 
     def _on_next_pick(self):

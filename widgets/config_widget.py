@@ -12,6 +12,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QFont
 from config.config_manager import config
+from config.styles import CONFIG_SAVE_BUTTON
 
 
 class ConfigWidget(QWidget):
@@ -128,7 +129,7 @@ class ConfigWidget(QWidget):
         self.export_btn.clicked.connect(self._export_config)
 
         self.save_btn = QPushButton("Save")
-        self.save_btn.setStyleSheet("background-color: #4CAF50; color: white; font-weight: bold; padding: 10px;")
+        self.save_btn.setStyleSheet(CONFIG_SAVE_BUTTON)
         self.save_btn.clicked.connect(self._save_config)
 
         self.cancel_btn = QPushButton("Cancel")
