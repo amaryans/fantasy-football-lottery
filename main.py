@@ -6,8 +6,8 @@ import sys
 
 from PyQt5.QtWidgets import QApplication, QHBoxLayout, QMainWindow, QVBoxLayout, QAction
 
-from layout_colorwidget import Color
-from lottery import LotterySim
+from widgets.layout_colorwidget import Color
+from lottery.lottery import LotterySim
 from widgets.header_widget import HeaderWidget
 from widgets.draft_order_widget import DraftOrderWidget
 from widgets.lottery_window_widget import LotteryWindowWidget

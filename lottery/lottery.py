@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from lottery_simulator import Simulator
+from .lottery_simulator import Simulator
 from config.config_manager import config
 
 class LotterySim():
