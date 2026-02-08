@@ -3,11 +3,13 @@ Standings widget for the Fantasy Football Lottery application.
 Displays the previous year's final standings.
 """
 
-import pandas as pd
 from PyQt5.QtWidgets import QHBoxLayout, QLabel, QVBoxLayout, QWidget
 
-from config.styles import STANDINGS_ROW, OWNER_LABEL, TEAM_LABEL, WIN_LOSS_LABEL
-from config.constants import NUMBER_OF_TEAMS, STANDINGS_CSV_PATH
+from config.styles import (
+    STANDINGS_CONTAINER, STANDINGS_ROW_NORMAL, STANDINGS_ROW_LAST,
+    STANDINGS_OWNER_LABEL, STANDINGS_TEAM_LABEL, STANDINGS_RECORD_LABEL
+)
+from config.config_manager import config
 
 
 class StandingsWidget(QWidget):
@@ -20,23 +22,18 @@ class StandingsWidget(QWidget):
         self._setup_ui()
 
     def _load_standings(self):
-        """Load standings data from CSV file."""
+        """Load standings data from configuration."""
         try:
-            df = pd.read_csv(STANDINGS_CSV_PATH)
-            self.standings_data = df.to_numpy()
-        except FileNotFoundError:
-            print(f"Warning: Could not find standings file at {STANDINGS_CSV_PATH}")
+            self.standings_data = config.get_standings_data()
+        except Exception as e:
+            print(f"Warning: Could not load standings data: {e}")
             self.standings_data = []
 
     def _setup_ui(self):
         """Initialize and configure the standings UI elements."""
         # Create container with outer border
         container = QWidget()
-        container.setStyleSheet("""
-            background-color: white;
-            border: 2px solid #013369;
-            border-radius: 10px;
-        """)
+        container.setStyleSheet(STANDINGS_CONTAINER)
 
         layout = QVBoxLayout()
         layout.setSpacing(0)  # Remove spacing between rows
@@ -48,13 +45,24 @@ class StandingsWidget(QWidget):
             layout.addWidget(error_label)
         else:
             # Create a row for each team (including header)
-            for i in range(min(NUMBER_OF_TEAMS + 1, len(self.standings_data))):
+            # Add the header
+            row_widget = self._create_standings_row(
+                    "Owner",
+                    "Team Name",
+                    "Record",
+                    is_first=True,
+                    is_last=False
+                )
+            layout.addWidget(row_widget)
+
+            # Add rest of the teams
+            for i in range(min(config.number_of_teams, len(self.standings_data))):
                 row_widget = self._create_standings_row(
                     self.standings_data[i][0],
                     self.standings_data[i][1],
                     self.standings_data[i][2],
                     is_first=(i == 0),
-                    is_last=(i == min(NUMBER_OF_TEAMS, len(self.standings_data) - 1))
+                    is_last=(i == min(config.number_of_teams - 1, len(self.standings_data) - 1))
                 )
                 layout.addWidget(row_widget)
 
@@ -83,16 +91,9 @@ class StandingsWidget(QWidget):
 
         # Style with thin bottom border between rows, no rounding
         if is_last:
-            border_style = "border: none;"
+            row_widget.setStyleSheet(STANDINGS_ROW_LAST)
         else:
-            border_style = "border: none; border-bottom: 1px solid #013369;"
-
-        row_widget.setStyleSheet(f"""
-            background-color: white;
-            {border_style}
-            padding: 8px;
-            border-radius: 0px;
-        """)
+            row_widget.setStyleSheet(STANDINGS_ROW_NORMAL)
 
         row_layout = QHBoxLayout()
         row_layout.setSpacing(10)
@@ -101,32 +102,15 @@ class StandingsWidget(QWidget):
 
         # Owner label
         owner_label = QLabel(str(owner))
-        owner_label.setStyleSheet("""
-            font: bold 14px;
-            min-width: 5em;
-            max-width: 5em;
-            border: none;
-            background: transparent;
-        """)
+        owner_label.setStyleSheet(STANDINGS_OWNER_LABEL)
 
         # Team label
         team_label = QLabel(str(team))
-        team_label.setStyleSheet("""
-            font: bold 14px;
-            min-width: 8em;
-            border: none;
-            background: transparent;
-        """)
+        team_label.setStyleSheet(STANDINGS_TEAM_LABEL)
 
         # Record label
         record_label = QLabel(str(record))
-        record_label.setStyleSheet("""
-            font: bold 14px;
-            min-width: 5em;
-            max-width: 5em;
-            border: none;
-            background: transparent;
-        """)
+        record_label.setStyleSheet(STANDINGS_RECORD_LABEL)
 
         # Add to row layout
         row_layout.addWidget(owner_label)

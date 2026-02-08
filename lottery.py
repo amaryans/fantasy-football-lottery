@@ -2,13 +2,25 @@ import numpy as np
 import pandas as pd
 
 from lottery_simulator import Simulator
+from config.config_manager import config
 
 class LotterySim():
     def __init__(self):
-        self.n_picks = 12
+        # Load configuration from config manager
+        self.n_picks = config.number_of_teams
         self.n_balls = 4
-        self.places = ['TCoop', 'Dom', 'Carson', 'Gus', 'Logan', 'Beans', 'Sam', 'Austin', 'Addi', 'Jakeb', 'Batches', 'Owen']
-        self.chances = [200, 175, 150, 120, 90, 75, 60, 45, 37, 28, 18, 7]
+        self.places = config.owner_names
+        self.places.reverse()
+        # Generate chances based on standings (reverse order - worst team gets most chances)
+        # This creates a decreasing sequence of chances
+        if len(self.places) > 0:
+            max_chance = 200
+            min_chance = 7
+            step = (max_chance - min_chance) / (len(self.places) - 1) if len(self.places) > 1 else 0
+            self.chances = [int(max_chance - i * step) for i in range(len(self.places))]
+        else:
+            self.chances = []
+
         self.sim = Simulator(self.n_picks, self.n_balls, self.chances)
 
     def runSampleSim(self):

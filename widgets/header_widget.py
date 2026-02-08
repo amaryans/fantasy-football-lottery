@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QHBoxLayout, QLabel, QWidget
 from PyQt5.QtGui import QPixmap
 
 from config.styles import HEADER
-from config.constants import LOGO_PATH, LEAGUE_NAME
+from config.config_manager import config
 
 
 class HeaderWidget(QWidget):
@@ -25,12 +25,12 @@ class HeaderWidget(QWidget):
 
         # Logo image
         image_label = QLabel()
-        pixmap = QPixmap(LOGO_PATH)
+        pixmap = QPixmap(config.logo_path)
         pixmap = pixmap.scaledToHeight(150)
         image_label.setPixmap(pixmap)
 
         # League name text
-        text_label = QLabel(LEAGUE_NAME)
+        text_label = QLabel(config.league_name)
         text_label.setStyleSheet(HEADER)
 
         # Add widgets to layout

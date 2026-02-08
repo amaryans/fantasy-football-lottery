@@ -11,7 +11,7 @@ from config.styles import (
     DRAFT_PICK_SELECTOR_HIGHLIGHTED,
     DRAFT_PICK_SELECTOR_DISABLED
 )
-from config.constants import NUMBER_OF_TEAMS
+from config.config_manager import config
 
 
 class DraftPickSelectorWidget(QWidget):
@@ -43,14 +43,14 @@ class DraftPickSelectorWidget(QWidget):
         right_layout = QVBoxLayout()
 
         # Create pick buttons (1-12)
-        for i in range(NUMBER_OF_TEAMS):
+        for i in range(config.number_of_teams):
             button = QPushButton(str(i + 1))
             button.setStyleSheet(DRAFT_PICK_SELECTOR)
             button.clicked.connect(lambda checked, pos=i: self._on_pick_selected(pos))
             self.pick_buttons.append(button)
 
             # Distribute buttons across two columns
-            if i < NUMBER_OF_TEAMS / 2:
+            if i < config.number_of_teams / 2:
                 left_layout.addWidget(button)
             else:
                 right_layout.addWidget(button)
