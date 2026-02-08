@@ -3,11 +3,10 @@ Standings widget for the Fantasy Football Lottery application.
 Displays the previous year's final standings.
 """
 
-import pandas as pd
 from PyQt5.QtWidgets import QHBoxLayout, QLabel, QVBoxLayout, QWidget
 
 from config.styles import STANDINGS_ROW, OWNER_LABEL, TEAM_LABEL, WIN_LOSS_LABEL
-from config.constants import NUMBER_OF_TEAMS, STANDINGS_CSV_PATH
+from config.config_manager import config
 
 
 class StandingsWidget(QWidget):
@@ -20,12 +19,11 @@ class StandingsWidget(QWidget):
         self._setup_ui()
 
     def _load_standings(self):
-        """Load standings data from CSV file."""
+        """Load standings data from configuration."""
         try:
-            df = pd.read_csv(STANDINGS_CSV_PATH)
-            self.standings_data = df.to_numpy()
-        except FileNotFoundError:
-            print(f"Warning: Could not find standings file at {STANDINGS_CSV_PATH}")
+            self.standings_data = config.get_standings_data()
+        except Exception as e:
+            print(f"Warning: Could not load standings data: {e}")
             self.standings_data = []
 
     def _setup_ui(self):
@@ -48,13 +46,24 @@ class StandingsWidget(QWidget):
             layout.addWidget(error_label)
         else:
             # Create a row for each team (including header)
-            for i in range(min(NUMBER_OF_TEAMS + 1, len(self.standings_data))):
+            # Add the header
+            row_widget = self._create_standings_row(
+                    "Owner",
+                    "Team Name",
+                    "Record",
+                    is_first=True,
+                    is_last=False
+                )
+            layout.addWidget(row_widget)
+
+            # Add rest of the teams
+            for i in range(min(config.number_of_teams, len(self.standings_data))):
                 row_widget = self._create_standings_row(
                     self.standings_data[i][0],
                     self.standings_data[i][1],
                     self.standings_data[i][2],
                     is_first=(i == 0),
-                    is_last=(i == min(NUMBER_OF_TEAMS, len(self.standings_data) - 1))
+                    is_last=(i == min(config.number_of_teams - 1, len(self.standings_data) - 1))
                 )
                 layout.addWidget(row_widget)
 

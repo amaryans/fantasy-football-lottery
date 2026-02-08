@@ -1,0 +1,79 @@
+{
+  "league_name": "West KTown Fantasy Football League",
+  "number_of_teams": 12,
+  "logo_path": "./data/wktownffbllogo.png",
+  "owners": [
+    {
+      "owner": "Owen",
+      "team_name": "Owen Wan Kenobi",
+      "record": "9-5",
+      "image_path": "./data/owen.jpeg"
+    },
+    {
+      "owner": "Batches",
+      "team_name": "Darth Batches",
+      "record": "7-7",
+      "image_path": "./data/wktownffbllogo.png"
+    },
+    {
+      "owner": "Jakeb",
+      "team_name": "Sunny In Philadelphia",
+      "record": "10-4",
+      "image_path": "./data/wktownffbllogo.png"
+    },
+    {
+      "owner": "Addi",
+      "team_name": "Anazyn Skywalkers",
+      "record": "9-5",
+      "image_path": "./data/addi.JPEG"
+    },
+    {
+      "owner": "Austin",
+      "team_name": "Sacraficial Lambs",
+      "record": "8-6",
+      "image_path": "./data/wktownffbllogo.png"
+    },
+    {
+      "owner": "Sam",
+      "team_name": "Batman and Robinson",
+      "record": "7-7",
+      "image_path": "./data/wktownffbllogo.png"
+    },
+    {
+      "owner": "Beans",
+      "team_name": "Fuck Stefon Diggs",
+      "record": "6-8",
+      "image_path": "./data/wktownffbllogo.png"
+    },
+    {
+      "owner": "Logan",
+      "team_name": "Clark Street Dawgs",
+      "record": "6-8",
+      "image_path": "./data/wktownffbllogo.png"
+    },
+    {
+      "owner": "Gus",
+      "team_name": "Bitch Cup",
+      "record": "5-9",
+      "image_path": "./data/wktownffbllogo.png"
+    },
+    {
+      "owner": "Carson",
+      "team_name": "Euro Trash'd",
+      "record": "6-8",
+      "image_path": "./data/wktownffbllogo.png"
+    },
+    {
+      "owner": "Dom",
+      "team_name": "domthebomb44",
+      "record": "4-10",
+      "image_path": "./data/wktownffbllogo.png"
+    },
+    {
+      "owner": "TCoop",
+      "team_name": "Magic Mike Tython",
+      "record": "7-7",
+      "image_path": "./data/wktownffbllogo.png"
+    }
+  ]
+}

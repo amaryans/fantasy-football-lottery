@@ -6,7 +6,7 @@ Displays the top row showing the current draft order.
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QFrame, QHBoxLayout, QLabel, QSizePolicy, QVBoxLayout, QWidget, QLayout
 
-from config.constants import NUMBER_OF_TEAMS
+from config.config_manager import config
 from config.styles import DRAFT_ORDER_BUTTON, LOTTERY_WINDOW_BACKGROUND
 
 class DraftPickBox(QWidget):
@@ -75,11 +75,11 @@ class DraftOrderWidget(QWidget):
         layout.setContentsMargins(8, 0, 8, 0)  # Remove margins
 
         # Create pick box for each draft pick
-        for i in range(NUMBER_OF_TEAMS):
+        for i in range(config.number_of_teams):
             pick_box = DraftPickBox(i + 1)  # Pick numbers are 1-indexed for display
             self.picks.append(pick_box)
             layout.addWidget(pick_box)
-        
+
         self.setLayout(layout)
 
     def set_pick(self, position, owner_name):

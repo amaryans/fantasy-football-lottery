@@ -4,7 +4,7 @@ Main application file for the Fantasy Football Lottery GUI.
 
 import sys
 
-from PyQt5.QtWidgets import QApplication, QHBoxLayout, QMainWindow, QVBoxLayout
+from PyQt5.QtWidgets import QApplication, QHBoxLayout, QMainWindow, QVBoxLayout, QAction
 
 from layout_colorwidget import Color
 from lottery import LotterySim
@@ -13,6 +13,7 @@ from widgets.draft_order_widget import DraftOrderWidget
 from widgets.lottery_window_widget import LotteryWindowWidget
 from widgets.standings_widget import StandingsWidget
 from widgets.draft_pick_selector_widget import DraftPickSelectorWidget
+from widgets.config_widget import ConfigWidget
 
 
 class MainWindow(QMainWindow):
@@ -31,8 +32,41 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("West KTown Fantasy Football Lottery")
         self.setGeometry(100, 100, 1920, 800)
 
+        # Initialize configuration widget
+        self.config_widget = None
+
+        # Setup menu bar
+        self._setup_menu_bar()
+
         # Initialize UI
         self._setup_ui()
+
+    def _setup_menu_bar(self):
+        """Setup the application menu bar."""
+        menubar = self.menuBar()
+
+        # Settings menu
+        settings_menu = menubar.addMenu("Settings")
+
+        # Configuration action
+        config_action = QAction("Configuration", self)
+        config_action.setShortcut("Ctrl+,")
+        config_action.triggered.connect(self._open_config)
+        settings_menu.addAction(config_action)
+
+    def _open_config(self):
+        """Open the configuration window."""
+        if self.config_widget is None or not self.config_widget.isVisible():
+            self.config_widget = ConfigWidget()
+            self.config_widget.config_saved.connect(self._on_config_saved)
+        self.config_widget.show()
+        self.config_widget.raise_()
+        self.config_widget.activateWindow()
+
+    def _on_config_saved(self):
+        """Handle configuration saved event."""
+        # You could reload the application or update specific components here
+        pass
 
     def _setup_ui(self):
         """Initialize and configure all UI components."""

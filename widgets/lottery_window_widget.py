@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QHBoxLayout, QLabel, QPushButton, QVBoxLayout, QWidg
 from PyQt5.QtGui import QPixmap
 
 from config.styles import LOTTERY_WINDOW_BACKGROUND, NEXT_PICK_BUTTON
-from config.constants import LOGO_PATH, OWNER_IMAGES
+from config.config_manager import config
 
 
 class LotteryWindowWidget(QWidget):
@@ -60,7 +60,7 @@ class LotteryWindowWidget(QWidget):
 
         # Owner image
         self.owner_image_label = QLabel("", alignment=Qt.AlignCenter)
-        pixmap = QPixmap(LOGO_PATH)
+        pixmap = QPixmap(config.logo_path)
         pixmap = pixmap.scaledToHeight(250)
         self.owner_image_label.setPixmap(pixmap)
 
@@ -94,8 +94,9 @@ class LotteryWindowWidget(QWidget):
         self.owner_name_label.setText(owner_name)
 
         # Update image if available
-        if owner_name in OWNER_IMAGES:
-            pixmap = QPixmap(OWNER_IMAGES[owner_name])
+        owner_images = config.owner_images
+        if owner_name in owner_images:
+            pixmap = QPixmap(owner_images[owner_name])
             pixmap = pixmap.scaledToHeight(250)
             self.owner_image_label.setPixmap(pixmap)
 
