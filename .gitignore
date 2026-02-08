@@ -8,7 +8,7 @@ __pycache__/
 
 # Distribution / packaging
 .Python
-build/
+build/fantasy_football_lottery
 develop-eggs/
 dist/
 downloads/
