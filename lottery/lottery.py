@@ -1,8 +1,11 @@
+import os
+
 import numpy as np
 import pandas as pd
 
 from .lottery_simulator import Simulator
 from config.config_manager import config
+from config.paths import get_app_dir
 
 class LotterySim():
     def __init__(self):
@@ -31,7 +34,12 @@ class LotterySim():
         for i in range(len(self.places)):
             print(self.places[i])
             df[self.places[i]] = (np.round(np.bincount(lottery_simulation[:, i], minlength=len(self.places)) / len(lottery_simulation), 3))
-        df.to_csv('./example_result/conditional_probabilities.csv')
+        try:
+            output_dir = os.path.join(get_app_dir(), "example_result")
+            os.makedirs(output_dir, exist_ok=True)
+            df.to_csv(os.path.join(output_dir, 'conditional_probabilities.csv'))
+        except Exception as e:
+            print(f"Warning: Could not write sample simulation CSV: {e}")
 
     def runSim(self):
         iters = 1

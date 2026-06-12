@@ -4,6 +4,9 @@ Configuration manager for loading and managing application settings from JSON.
 
 import json
 import os
+import shutil
+
+from config.paths import get_config_path, get_default_config_path, resolve_resource_path
 
 
 class ConfigManager:
@@ -21,8 +24,17 @@ class ConfigManager:
     def __init__(self):
         """Initialize the configuration manager."""
         if self._config is None:
-            self.config_path = "./config/league_config.json"
+            self.config_path = get_config_path()
+            self._ensure_writable_config()
             self.load_config()
+
+    def _ensure_writable_config(self):
+        """On first run of a packaged exe, copy bundled default config to writable location."""
+        if not os.path.exists(self.config_path):
+            default_path = get_default_config_path()
+            if os.path.exists(default_path) and default_path != self.config_path:
+                os.makedirs(os.path.dirname(self.config_path), exist_ok=True)
+                shutil.copy2(default_path, self.config_path)
 
     def load_config(self):
         """Load configuration from JSON file, create default if not exists."""
@@ -144,7 +156,13 @@ class ConfigManager:
 
     @property
     def logo_path(self):
-        """Get league logo path."""
+        """Get league logo path, resolved to an absolute path."""
+        raw_path = self._config.get("logo_path", "./data/wktownffbllogo.png")
+        return resolve_resource_path(raw_path)
+
+    @property
+    def raw_logo_path(self):
+        """Get the raw (unresolved) logo path as stored in config."""
         return self._config.get("logo_path", "./data/wktownffbllogo.png")
 
     @property
@@ -154,8 +172,8 @@ class ConfigManager:
 
     @property
     def owner_images(self):
-        """Get dictionary mapping owner names to image paths."""
-        return {owner["owner"]: owner["image_path"] for owner in self.owners}
+        """Get dictionary mapping owner names to resolved image paths."""
+        return {owner["owner"]: resolve_resource_path(owner["image_path"]) for owner in self.owners}
 
     @property
     def owner_names(self):

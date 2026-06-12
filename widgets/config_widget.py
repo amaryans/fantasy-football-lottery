@@ -12,6 +12,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QFont
 from config.config_manager import config
+from config.paths import get_config_path
 from config.styles import CONFIG_SAVE_BUTTON
 
 
@@ -22,7 +23,7 @@ class ConfigWidget(QWidget):
 
     def __init__(self):
         super().__init__()
-        self.config_path = "./config/league_config.json"
+        self.config_path = get_config_path()
         self._setup_ui()
         self._load_config()
 
@@ -156,7 +157,7 @@ class ConfigWidget(QWidget):
             # Load general settings
             self.league_name_input.setText(config.league_name)
             self.num_teams_input.setValue(config.number_of_teams)
-            self.logo_path_input.setText(config.logo_path)
+            self.logo_path_input.setText(config.raw_logo_path)
 
             # Load owners
             owners = config.owners
@@ -195,12 +196,7 @@ class ConfigWidget(QWidget):
             "Image Files (*.png *.jpg *.jpeg *.gif *.bmp)"
         )
         if file_path:
-            # Convert to relative path if possible
-            try:
-                rel_path = os.path.relpath(file_path)
-                self.logo_path_input.setText(rel_path.replace('\\', '/'))
-            except:
-                self.logo_path_input.setText(file_path.replace('\\', '/'))
+            self.logo_path_input.setText(file_path.replace('\\', '/'))
 
     def _save_config(self):
         """Save configuration to JSON file."""
