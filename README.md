@@ -20,11 +20,13 @@ See [USER_GUIDE.md](USER_GUIDE.md) for complete instructions on using the applic
 ### For Developers
 
 #### Running from Source
+
 ```bash
 python main.py
 ```
 
 #### Building Executable
+
 ```bash
 cd build
 build.bat       # Windows
@@ -68,6 +70,7 @@ fantasy-football-lottery/
 - pandas
 
 Install dependencies:
+
 ```bash
 pip install -r build/requirements.txt
 ```
@@ -82,6 +85,7 @@ The application uses JSON-based configuration stored in `config/league_config.js
 - League logo
 
 Configuration can be managed through:
+
 - Built-in GUI (Settings → Configuration)
 - Direct JSON file editing
 - Import/Export functionality
@@ -91,11 +95,13 @@ Configuration can be managed through:
 To create a standalone executable:
 
 1. Navigate to the build directory:
+
    ```bash
    cd build
    ```
 
 2. Run the build script:
+
    ```bash
    build.bat       # Windows
    python build.py # Cross-platform
