@@ -64,14 +64,14 @@ describe('phase machine', () => {
 })
 
 describe('reveal flow', () => {
-  test('reveals run from worst pick to first pick', () => {
+  test('reveals run from pick 1 to the last pick', () => {
     useAppStore.getState().setLeague(makeLeague(4))
     useAppStore.getState().startLottery()
     const pickOrder = useAppStore.getState().result?.pickOrder ?? []
     useAppStore.getState().revealNext()
-    expect(revealedTeamIds(useAppStore.getState())).toEqual([pickOrder[3]])
+    expect(revealedTeamIds(useAppStore.getState())).toEqual([pickOrder[0]])
     useAppStore.getState().revealNext()
-    expect(revealedTeamIds(useAppStore.getState())).toEqual([pickOrder[3], pickOrder[2]])
+    expect(revealedTeamIds(useAppStore.getState())).toEqual([pickOrder[0], pickOrder[1]])
   })
 
   test('revealNext stops at the total pick count', () => {
@@ -83,15 +83,15 @@ describe('reveal flow', () => {
     expect(useAppStore.getState().revealCursor).toBe(4)
   })
 
-  test('undoReveal steps back and clears that team slot choice', () => {
+  test('undoSlotAssignment unlocks the last slot without hiding the reveal', () => {
     useAppStore.getState().setLeague(makeLeague(4))
     useAppStore.getState().startLottery()
     useAppStore.getState().revealNext()
     const revealed = revealedTeamIds(useAppStore.getState())[0] as string
     useAppStore.getState().assignSlot(revealed, 4)
-    useAppStore.getState().undoReveal()
+    useAppStore.getState().undoSlotAssignment()
     const state = useAppStore.getState()
-    expect(state.revealCursor).toBe(0)
+    expect(state.revealCursor).toBe(1)
     expect(state.slotAssignments).toHaveLength(0)
   })
 })

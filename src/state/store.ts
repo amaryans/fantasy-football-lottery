@@ -17,7 +17,7 @@ interface AppState {
   /** Frozen at Start Lottery: seeded teams + odds the result was drawn from. */
   lotteryConfig: LotteryConfig | null
   result: LotteryResult | null
-  /** Number of picks revealed so far (reveals run worst pick -> #1 pick). */
+  /** Number of picks revealed so far (reveals run pick 1 -> pick N). */
   revealCursor: number
   slotAssignments: DraftSlotAssignment[]
 
@@ -28,7 +28,6 @@ interface AppState {
   goToPhase: (phase: AppPhase) => void
   startLottery: () => void
   revealNext: () => void
-  undoReveal: () => void
   assignSlot: (teamId: string, slot: number) => void
   undoSlotAssignment: () => void
   finishEvent: () => void
@@ -96,19 +95,6 @@ export const useAppStore = create<AppState>()(
           return state.revealCursor < total ? { revealCursor: state.revealCursor + 1 } : {}
         }),
 
-      undoReveal: () =>
-        set((state) => {
-          if (state.revealCursor === 0) {
-            return {}
-          }
-          // Undoing a reveal also drops any slot chosen for that revealed team.
-          const lastRevealedId = revealedTeamIds(state)[state.revealCursor - 1]
-          return {
-            revealCursor: state.revealCursor - 1,
-            slotAssignments: state.slotAssignments.filter((a) => a.teamId !== lastRevealedId),
-          }
-        }),
-
       assignSlot: (teamId, slot) =>
         set((state) => {
           const total = state.result?.pickOrder.length ?? 0
@@ -140,12 +126,12 @@ export const useAppStore = create<AppState>()(
   ),
 )
 
-/** Team ids in the order they get revealed: worst pick first, #1 pick last. */
+/** Team ids in the order they get revealed: pick 1 first, so the #1 winner claims a slot first. */
 export function revealedTeamIds(state: Pick<AppState, 'result' | 'revealCursor'>): string[] {
   if (!state.result) {
     return []
   }
-  return [...state.result.pickOrder].reverse().slice(0, state.revealCursor)
+  return state.result.pickOrder.slice(0, state.revealCursor)
 }
 
 /**
