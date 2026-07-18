@@ -1,7 +1,23 @@
+import { useAppStore } from './state/store.ts'
+import SetupScreen from './screens/SetupScreen.tsx'
+import LeagueReviewScreen from './screens/LeagueReviewScreen.tsx'
+import ConfigScreen from './screens/ConfigScreen.tsx'
+import EventScreen from './screens/EventScreen.tsx'
+import ResultsScreen from './screens/ResultsScreen.tsx'
+
 export default function App() {
-  return (
-    <main className="flex min-h-screen items-center justify-center bg-navy text-white">
-      <h1 className="text-4xl font-bold">Fantasy Football Draft Lottery</h1>
-    </main>
-  )
+  const phase = useAppStore((state) => state.phase)
+
+  switch (phase) {
+    case 'setup':
+      return <SetupScreen />
+    case 'review':
+      return <LeagueReviewScreen />
+    case 'config':
+      return <ConfigScreen />
+    case 'event':
+      return <EventScreen />
+    case 'results':
+      return <ResultsScreen />
+  }
 }
