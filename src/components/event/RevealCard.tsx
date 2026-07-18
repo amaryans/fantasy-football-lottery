@@ -53,7 +53,10 @@ export default function RevealCard({
         {stage === 'revealed' ? `Pick ${pickNumber}` : `Up next: pick ${pickNumber}`}
       </p>
 
-      <div className="relative aspect-[4/5] w-full" style={{ perspective: 1200 }}>
+      <div
+        className="relative aspect-[4/5] max-h-[max(50vh,22rem)] w-full"
+        style={{ perspective: 1200 }}
+      >
         <AnimatePresence initial={false}>
           {stage === 'idle' && (
             <motion.div

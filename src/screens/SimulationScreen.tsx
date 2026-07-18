@@ -42,7 +42,7 @@ export default function SimulationScreen() {
 
   if (!league || !simulation) {
     return (
-      <main className="flex min-h-screen flex-col items-center justify-center gap-4 bg-navy text-white">
+      <main className="flex flex-1 flex-col items-center justify-center gap-4 text-white">
         <p>Load a league to run simulations.</p>
         <Button onClick={() => goToPhase('setup')}>Back to setup</Button>
       </main>
@@ -53,7 +53,7 @@ export default function SimulationScreen() {
   const showTopGroup = teamCount > TOP_GROUP_SIZE
 
   return (
-    <main className="flex min-h-screen flex-col items-center gap-6 bg-navy px-4 py-8 text-white">
+    <main className="flex flex-1 flex-col items-center gap-6 px-4 py-6 text-white sm:py-8">
       <header className="w-full max-w-6xl">
         <h1 className="text-3xl font-bold">Simulation test</h1>
         <p className="mt-1 max-w-2xl text-white/60">

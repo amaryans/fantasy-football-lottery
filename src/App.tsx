@@ -30,9 +30,9 @@ function CurrentScreen() {
 export default function App() {
   return (
     <ErrorBoundary>
-      <div className="flex min-h-screen flex-col bg-navy">
+      <div className="flex min-h-screen flex-col overflow-x-clip bg-navy">
         <NavBar />
-        <div className="flex-1">
+        <div className="flex flex-1 flex-col">
           <CurrentScreen />
         </div>
       </div>

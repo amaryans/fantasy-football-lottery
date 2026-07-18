@@ -32,7 +32,7 @@ export default function OddsTable({ seededTeams, oddsBps }: OddsTableProps) {
               <div className="flex items-center gap-2">
                 <TeamAvatar src={team.avatarUrl} alt="" className="size-8" />
                 <span className="font-medium">{team.teamName}</span>
-                <span className="text-white/50">· {team.ownerName}</span>
+                <span className="hidden text-white/50 md:inline">· {team.ownerName}</span>
               </div>
             </td>
             <td className="px-3 py-2 text-center tabular-nums text-white/70">

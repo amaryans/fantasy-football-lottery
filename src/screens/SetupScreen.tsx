@@ -10,7 +10,7 @@ export default function SetupScreen() {
   const goToPhase = useAppStore((state) => state.goToPhase)
 
   return (
-    <main className="flex min-h-screen flex-col items-center gap-10 bg-navy px-4 py-12 text-white">
+    <main className="flex flex-1 flex-col items-center gap-10 px-4 py-8 text-white sm:py-12">
       <header className="text-center">
         <h1 className="text-4xl font-bold sm:text-5xl">Fantasy Football Draft Lottery</h1>
         <p className="mt-3 max-w-xl text-lg text-white/70">

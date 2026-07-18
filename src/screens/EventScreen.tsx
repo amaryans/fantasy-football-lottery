@@ -167,7 +167,7 @@ export default function EventScreen() {
 
   if (!league || !result || !lotteryConfig) {
     return (
-      <main className="flex min-h-screen flex-col items-center justify-center gap-4 bg-navy text-white">
+      <main className="flex flex-1 flex-col items-center justify-center gap-4 text-white">
         <p>No lottery in progress.</p>
         <Button onClick={startOver}>Back to setup</Button>
       </main>
@@ -175,7 +175,7 @@ export default function EventScreen() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col gap-4 bg-navy px-4 py-4 text-white lg:px-8">
+    <main className="flex flex-1 flex-col gap-4 px-4 py-4 text-white lg:px-8">
       <header className="flex items-center justify-between gap-4">
         <h1 className="truncate text-xl font-bold text-white/80 sm:text-2xl">{league.name}</h1>
         <Button

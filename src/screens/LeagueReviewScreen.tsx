@@ -29,7 +29,7 @@ export default function LeagueReviewScreen() {
   if (!league) {
     // Shouldn't happen (phase machine sets a league before review), but recover gracefully.
     return (
-      <main className="flex min-h-screen flex-col items-center justify-center gap-4 bg-navy text-white">
+      <main className="flex flex-1 flex-col items-center justify-center gap-4 text-white">
         <p>No league loaded yet.</p>
         <Button onClick={startOver}>Back to setup</Button>
       </main>
@@ -39,7 +39,7 @@ export default function LeagueReviewScreen() {
   const isManual = league.source === 'manual'
 
   return (
-    <main className="flex min-h-screen flex-col items-center gap-8 bg-navy px-4 py-10 text-white">
+    <main className="flex flex-1 flex-col items-center gap-8 px-4 py-6 text-white sm:py-10">
       <header className="flex w-full max-w-5xl flex-col gap-2">
         <h1 className="text-3xl font-bold">Review your league</h1>
         <p className="text-white/60">

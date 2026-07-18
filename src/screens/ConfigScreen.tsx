@@ -95,7 +95,7 @@ export default function ConfigScreen() {
 
   if (!league) {
     return (
-      <main className="flex min-h-screen flex-col items-center justify-center gap-4 bg-navy text-white">
+      <main className="flex flex-1 flex-col items-center justify-center gap-4 text-white">
         <p>No league loaded yet.</p>
         <Button onClick={startOver}>Back to setup</Button>
       </main>
@@ -103,7 +103,7 @@ export default function ConfigScreen() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center gap-8 bg-navy px-4 py-10 text-white">
+    <main className="flex flex-1 flex-col items-center gap-8 px-4 py-6 text-white sm:py-10">
       <header className="w-full max-w-5xl">
         <h1 className="text-3xl font-bold">Lottery settings</h1>
         <p className="mt-1 text-white/60">{league.name}</p>
@@ -175,7 +175,9 @@ export default function ConfigScreen() {
         <section className="rounded-2xl border border-white/15 bg-white/5 p-5">
           <h2 className="mb-3 text-lg font-semibold">Odds preview</h2>
           {isSupportedSize ? (
-            <OddsTable seededTeams={seededTeams} oddsBps={oddsDraft} />
+            <div className="overflow-x-auto">
+              <OddsTable seededTeams={seededTeams} oddsBps={oddsDraft} />
+            </div>
           ) : (
             <ErrorBanner
               message={`Leagues of ${teamCount} teams aren't supported — the lottery works for ${MIN_TEAMS} to ${MAX_TEAMS} teams.`}

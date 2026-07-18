@@ -47,16 +47,16 @@ export default function NavBar() {
   return (
     <nav
       aria-label="Main navigation"
-      className="flex items-center gap-1 border-b border-white/10 bg-navy-dark px-4 py-2 text-sm"
+      className="flex flex-wrap items-center gap-x-1 gap-y-1 border-b border-white/10 bg-navy-dark px-2 py-2 text-sm sm:px-4"
     >
       <button
         type="button"
-        className={`px-3 py-1.5 font-semibold ${linkClasses(phase === 'setup' || phase === 'review', true)}`}
+        className={`px-3 py-1.5 font-semibold whitespace-nowrap ${linkClasses(phase === 'setup' || phase === 'review', true)}`}
         onClick={() => goToPhase('setup')}
       >
         🏈 Home
       </button>
-      <span className="mx-2 ml-4 font-semibold tracking-wider text-white/40 uppercase">
+      <span className="mx-1 font-semibold tracking-wider text-white/40 uppercase sm:mx-2 sm:ml-4">
         Lottery
       </span>
       {LOTTERY_ITEMS.map((item) => {
@@ -67,7 +67,7 @@ export default function NavBar() {
             type="button"
             disabled={!isEnabled}
             title={isEnabled ? undefined : 'Load a league first'}
-            className={`px-3 py-1.5 ${linkClasses(item.matches.includes(phase), isEnabled)}`}
+            className={`px-3 py-1.5 whitespace-nowrap ${linkClasses(item.matches.includes(phase), isEnabled)}`}
             onClick={() => goToPhase(item.phase)}
           >
             {item.label}

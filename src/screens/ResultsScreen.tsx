@@ -31,7 +31,7 @@ export default function ResultsScreen() {
 
   if (!league || !result || entries.length === 0) {
     return (
-      <main className="flex min-h-screen flex-col items-center justify-center gap-4 bg-navy text-white">
+      <main className="flex flex-1 flex-col items-center justify-center gap-4 text-white">
         <p>No completed lottery to show.</p>
         <Button onClick={startOver}>Back to setup</Button>
       </main>
@@ -68,7 +68,7 @@ export default function ResultsScreen() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center gap-8 bg-navy px-4 py-10 text-white">
+    <main className="flex flex-1 flex-col items-center gap-8 px-4 py-6 text-white sm:py-10">
       <h1 className="text-3xl font-bold">🏆 Final draft order</h1>
 
       <ResultsPoster
