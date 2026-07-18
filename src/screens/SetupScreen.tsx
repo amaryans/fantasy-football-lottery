@@ -6,6 +6,8 @@ import Button from '../components/common/Button.tsx'
 
 export default function SetupScreen() {
   const setLeague = useAppStore((state) => state.setLeague)
+  const league = useAppStore((state) => state.league)
+  const goToPhase = useAppStore((state) => state.goToPhase)
 
   return (
     <main className="flex min-h-screen flex-col items-center gap-10 bg-navy px-4 py-12 text-white">
@@ -16,6 +18,12 @@ export default function SetupScreen() {
           browser, nothing to install.
         </p>
       </header>
+
+      {league && (
+        <Button variant="secondary" onClick={() => goToPhase('review')}>
+          Continue with {league.name} →
+        </Button>
+      )}
 
       <div className="grid w-full max-w-4xl gap-6 sm:grid-cols-2">
         <section className="flex flex-col gap-4 rounded-2xl border border-white/15 bg-white/5 p-6">

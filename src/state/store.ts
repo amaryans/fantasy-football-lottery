@@ -1,14 +1,20 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { AppSettings, DraftSlotAssignment, League, Team } from '../data/types.ts'
-import { computeLotterySeeds } from '../data/ordering.ts'
-import { oddsForLeagueSize } from '../engine/odds.ts'
+import { buildLotteryConfig } from '../data/lotteryConfig.ts'
 import { runLottery } from '../engine/lottery.ts'
 import type { LotteryConfig, LotteryResult } from '../engine/types.ts'
 
-export type AppPhase = 'setup' | 'review' | 'config' | 'event' | 'results'
+export type AppPhase = 'setup' | 'review' | 'config' | 'simulation' | 'event' | 'results'
 
 const STORAGE_KEY = 'ffl.v1'
+
+const DEFAULT_SETTINGS: AppSettings = {
+  orderingSource: 'regularSeason',
+  slotMode: 'winnerChoosesSlot',
+  customOddsBps: null,
+  pickFloors: null,
+}
 
 interface AppState {
   phase: AppPhase
@@ -39,7 +45,7 @@ export const useAppStore = create<AppState>()(
     (set, get) => ({
       phase: 'setup',
       league: null,
-      settings: { orderingSource: 'regularSeason', slotMode: 'winnerChoosesSlot' },
+      settings: DEFAULT_SETTINGS,
       lotteryConfig: null,
       result: null,
       revealCursor: 0,
@@ -73,11 +79,7 @@ export const useAppStore = create<AppState>()(
         if (!league) {
           throw new Error('Cannot start the lottery without a league')
         }
-        const seededTeams = computeLotterySeeds(league.teams, settings.orderingSource)
-        const config: LotteryConfig = {
-          teams: seededTeams.map((team, index) => ({ id: team.id, seed: index + 1 })),
-          oddsBps: oddsForLeagueSize(seededTeams.length),
-        }
+        const config: LotteryConfig = buildLotteryConfig(league, settings)
         const seed = crypto.getRandomValues(new Uint32Array(1))[0] ?? 1
         const result = runLottery(config, seed, new Date().toISOString())
         set({
@@ -115,14 +117,31 @@ export const useAppStore = create<AppState>()(
         set({
           phase: 'setup',
           league: null,
-          settings: { orderingSource: 'regularSeason', slotMode: 'winnerChoosesSlot' },
+          settings: DEFAULT_SETTINGS,
           lotteryConfig: null,
           result: null,
           revealCursor: 0,
           slotAssignments: [],
         }),
     }),
-    { name: STORAGE_KEY, version: 1 },
+    {
+      name: STORAGE_KEY,
+      version: 1,
+      // Defensive rehydration: older or corrupted persisted snapshots merge on
+      // top of complete defaults so a bad localStorage entry can never leave
+      // the app with missing fields (and a blank screen).
+      merge: (persisted, current) => {
+        if (persisted === null || typeof persisted !== 'object') {
+          return current
+        }
+        const snapshot = persisted as Partial<AppState>
+        return {
+          ...current,
+          ...snapshot,
+          settings: { ...DEFAULT_SETTINGS, ...(snapshot.settings ?? {}) },
+        }
+      },
+    },
   ),
 )
 

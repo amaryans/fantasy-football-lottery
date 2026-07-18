@@ -74,6 +74,50 @@ describe('ConfigScreen', () => {
     expect(useAppStore.getState().settings.orderingSource).toBe('playoffs')
   })
 
+  test('advanced settings: setting a pick floor updates the store', async () => {
+    useAppStore.getState().setLeague(makeLeague(false))
+    const user = userEvent.setup()
+    render(<ConfigScreen />)
+
+    await user.click(screen.getByRole('button', { name: /advanced settings/i }))
+    await user.selectOptions(screen.getByLabelText(/pick floor for team-worst/i), '2')
+
+    expect(useAppStore.getState().settings.pickFloors).toEqual([2, null, null])
+  })
+
+  test('advanced settings: unbalanced odds block start until normalized', async () => {
+    useAppStore.getState().setLeague(makeLeague(false))
+    const user = userEvent.setup()
+    render(<ConfigScreen />)
+
+    await user.click(screen.getByRole('button', { name: /advanced settings/i }))
+    const oddsInput = screen.getByLabelText(/odds percent for team-worst/i)
+    await user.clear(oddsInput)
+    await user.type(oddsInput, '50')
+
+    expect(screen.getByRole('button', { name: /start the lottery/i })).toBeDisabled()
+    expect(screen.getByRole('alert')).toHaveTextContent(/add up to 100%/i)
+
+    await user.click(screen.getByRole('button', { name: /normalize to 100%/i }))
+
+    const odds = useAppStore.getState().settings.customOddsBps
+    expect(odds?.reduce((sum, bps) => sum + bps, 0)).toBe(10000)
+    expect(screen.getByRole('button', { name: /start the lottery/i })).toBeEnabled()
+  })
+
+  test('advanced settings: infeasible floors block start', async () => {
+    useAppStore.getState().setLeague(makeLeague(false))
+    const user = userEvent.setup()
+    render(<ConfigScreen />)
+
+    await user.click(screen.getByRole('button', { name: /advanced settings/i }))
+    await user.selectOptions(screen.getByLabelText(/pick floor for team-worst/i), '1')
+    await user.selectOptions(screen.getByLabelText(/pick floor for team-mid/i), '1')
+
+    expect(screen.getByRole('button', { name: /start the lottery/i })).toBeDisabled()
+    expect(screen.getByRole('alert')).toHaveTextContent(/top-1/i)
+  })
+
   test('start lottery runs the draw and enters the event phase', async () => {
     useAppStore.getState().setLeague(makeLeague(false))
     const user = userEvent.setup()
