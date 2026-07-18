@@ -9,9 +9,9 @@ import RevealCard, { type RevealStage } from '../components/event/RevealCard.tsx
 import SlotPicker from '../components/event/SlotPicker.tsx'
 
 const DRUMROLL_MS = 2500
-/** The last three picks get a longer, more agonizing drumroll. */
-const FINALE_DRUMROLL_MS = 4200
-const FINALE_PICKS = 3
+/** The first three picks (the biggest winners) get a longer, more agonizing drumroll. */
+const HEADLINE_DRUMROLL_MS = 4200
+const HEADLINE_PICKS = 3
 
 export default function EventScreen() {
   const league = useAppStore((state) => state.league)
@@ -21,12 +21,13 @@ export default function EventScreen() {
   const revealCursor = useAppStore((state) => state.revealCursor)
   const slotAssignments = useAppStore((state) => state.slotAssignments)
   const revealNext = useAppStore((state) => state.revealNext)
-  const undoReveal = useAppStore((state) => state.undoReveal)
   const assignSlot = useAppStore((state) => state.assignSlot)
+  const undoSlotAssignment = useAppStore((state) => state.undoSlotAssignment)
   const finishEvent = useAppStore((state) => state.finishEvent)
   const startOver = useAppStore((state) => state.startOver)
 
   const [stage, setStage] = useState<RevealStage>(revealCursor > 0 ? 'revealed' : 'idle')
+  const [tentativeSlot, setTentativeSlot] = useState<number | null>(null)
   const drumrollTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const teamsById = useMemo(
@@ -51,9 +52,8 @@ export default function EventScreen() {
     revealedIds.length > 0
       ? (teamsById.get(revealedIds[revealedIds.length - 1] as string) ?? null)
       : null
-  /** Pick number currently on the card (after reveal) or about to be drawn. */
-  const currentPickNumber =
-    stage === 'revealed' ? totalPicks - revealCursor + 1 : totalPicks - revealCursor
+  /** Pick number on the card: the pick just revealed, or the one about to be drawn. */
+  const currentPickNumber = stage === 'revealed' ? revealCursor : revealCursor + 1
   const candidates = seededTeams.filter((team) => !revealedIdSet.has(team.id))
 
   const isChooseMode = settings.slotMode === 'winnerChoosesSlot'
@@ -61,15 +61,29 @@ export default function EventScreen() {
     () => new Set(slotAssignments.map((assignment) => assignment.slot)),
     [slotAssignments],
   )
-  const needsSlotChoice =
-    isChooseMode &&
-    stage === 'revealed' &&
-    lastRevealedTeam !== null &&
-    !slotAssignments.some((assignment) => assignment.teamId === lastRevealedTeam.id)
+  const assignedTeamIds = useMemo(
+    () => new Set(slotAssignments.map((assignment) => assignment.teamId)),
+    [slotAssignments],
+  )
+  /** Earliest revealed winner still owed a slot — keeps undo recoverable at any depth. */
+  const pendingSlotTeam = isChooseMode
+    ? (revealedIds
+        .filter((id) => !assignedTeamIds.has(id))
+        .map((id) => teamsById.get(id))
+        .find((team): team is Team => team !== undefined) ?? null)
+    : null
+  const needsSlotChoice = pendingSlotTeam !== null && stage !== 'drumroll'
 
   const allRevealed = revealCursor === totalPicks && totalPicks > 0
   const isEventComplete = allRevealed && (!isChooseMode || slotAssignments.length === totalPicks)
   const canAdvance = stage !== 'drumroll' && !needsSlotChoice && !allRevealed
+  const canUndo =
+    stage === 'drumroll' || tentativeSlot !== null || (isChooseMode && slotAssignments.length > 0)
+
+  // A new winner on the clock always starts with a clean tentative choice.
+  useEffect(() => {
+    setTentativeSlot(null)
+  }, [pendingSlotTeam?.id])
 
   const boardSlots: BoardSlot[] = useMemo(() => {
     return Array.from({ length: totalPicks }, (_, i) => {
@@ -78,10 +92,9 @@ export default function EventScreen() {
         const assignment = slotAssignments.find((entry) => entry.slot === slot)
         return { slot, team: assignment ? (teamsById.get(assignment.teamId) ?? null) : null }
       }
-      // Lottery order = draft order: pick k is revealed once revealCursor >= totalPicks - k + 1.
-      const isRevealed = revealCursor >= totalPicks - slot + 1
+      // Lottery order = draft order: slot k fills once pick k is revealed.
       const teamId = result?.pickOrder[i]
-      return { slot, team: isRevealed && teamId ? (teamsById.get(teamId) ?? null) : null }
+      return { slot, team: revealCursor >= slot && teamId ? (teamsById.get(teamId) ?? null) : null }
     })
   }, [totalPicks, isChooseMode, slotAssignments, revealCursor, result, teamsById])
 
@@ -89,9 +102,9 @@ export default function EventScreen() {
     if (!canAdvance) {
       return
     }
-    const upcomingPickNumber = totalPicks - revealCursor
+    const upcomingPickNumber = revealCursor + 1
     setStage('drumroll')
-    const duration = upcomingPickNumber <= FINALE_PICKS ? FINALE_DRUMROLL_MS : DRUMROLL_MS
+    const duration = upcomingPickNumber <= HEADLINE_PICKS ? HEADLINE_DRUMROLL_MS : DRUMROLL_MS
     drumrollTimer.current = setTimeout(() => {
       revealNext()
       setStage('revealed')
@@ -99,21 +112,36 @@ export default function EventScreen() {
         void confetti({ particleCount: 250, spread: 110, origin: { y: 0.6 } })
       }
     }, duration)
-  }, [canAdvance, totalPicks, revealCursor, revealNext])
+  }, [canAdvance, revealCursor, revealNext])
 
+  /**
+   * Undo never re-hides a drawn lottery result — it cancels an in-flight
+   * drumroll, clears the tentative slot choice, or unlocks the last
+   * locked-in slot so the winner can choose again.
+   */
   const undo = useCallback(() => {
     if (stage === 'drumroll') {
       if (drumrollTimer.current) {
         clearTimeout(drumrollTimer.current)
       }
-      setStage('idle')
+      setStage(revealCursor > 0 ? 'revealed' : 'idle')
       return
     }
-    if (revealCursor > 0) {
-      undoReveal()
-      setStage('idle')
+    if (tentativeSlot !== null) {
+      setTentativeSlot(null)
+      return
     }
-  }, [stage, revealCursor, undoReveal])
+    if (isChooseMode && slotAssignments.length > 0) {
+      undoSlotAssignment()
+    }
+  }, [stage, revealCursor, tentativeSlot, isChooseMode, slotAssignments.length, undoSlotAssignment])
+
+  const confirmSlot = useCallback(() => {
+    if (pendingSlotTeam && tentativeSlot !== null) {
+      assignSlot(pendingSlotTeam.id, tentativeSlot)
+      setTentativeSlot(null)
+    }
+  }, [pendingSlotTeam, tentativeSlot, assignSlot])
 
   useEffect(
     () => () => {
@@ -188,14 +216,10 @@ export default function EventScreen() {
                   {stage === 'drumroll'
                     ? 'Drawing…'
                     : revealCursor === 0
-                      ? 'Reveal the first pick'
+                      ? 'Reveal the #1 pick'
                       : 'Next pick'}
                 </Button>
-                <Button
-                  variant="ghost"
-                  disabled={revealCursor === 0 && stage !== 'drumroll'}
-                  onClick={undo}
-                >
+                <Button variant="ghost" disabled={!canUndo} onClick={undo}>
                   Undo
                 </Button>
               </>
@@ -205,12 +229,14 @@ export default function EventScreen() {
         </section>
 
         <aside className="flex items-center justify-center lg:w-72">
-          {needsSlotChoice && lastRevealedTeam && (
+          {needsSlotChoice && pendingSlotTeam && (
             <SlotPicker
-              team={lastRevealedTeam}
+              team={pendingSlotTeam}
               totalSlots={totalPicks}
               takenSlots={takenSlots}
-              onPick={(slot) => assignSlot(lastRevealedTeam.id, slot)}
+              selectedSlot={tentativeSlot}
+              onSelect={setTentativeSlot}
+              onConfirm={confirmSlot}
             />
           )}
         </aside>
