@@ -4,54 +4,59 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Fantasy Football Lottery is a PyQt5 desktop application that runs a weighted draft lottery for fantasy football leagues. Owners are assigned lottery chances inversely proportional to their previous season record, then each winner selects their preferred draft position via a GUI.
+Fantasy Football Draft Lottery is a client-side React/TypeScript web app that runs an NBA-style
+weighted draft lottery for fantasy football leagues. Leagues import from the public Sleeper API
+(no key, CORS-enabled) or are entered manually; the lottery is revealed pick-by-pick with
+animations on draft night; results export as a shareable PNG. Deployed to GitHub Pages — there is
+no backend, and all state lives in localStorage.
+
+The original PyQt5 desktop app is preserved in `legacy/` (reference only — do not modify).
 
 ## Commands
 
 ```bash
-# Run the application
-python main.py
-
-# Install dependencies
-pip install -r build/requirements.txt
-
-# Build standalone executable (Windows)
-cd build && build.bat
-
-# Build standalone executable (cross-platform)
-cd build && python build.py
+npm run dev        # Vite dev server (base path /fantasy-football-lottery/)
+npm test           # Vitest run (engine Monte Carlo + RTL screen tests)
+npm run lint       # ESLint flat config (includes purity boundary rules)
+npm run typecheck  # tsc -b --noEmit (strict)
+npm run build      # tsc + vite build -> dist/
+npx prettier --write src   # format
 ```
-
-Built executable outputs to `dist/FantasyFootballLottery/FantasyFootballLottery.exe`.
 
 ## Architecture
 
-**Entry point:** `main.py` — creates `MainWindow(QMainWindow)` which orchestrates the lottery flow.
+**Phase flow:** `setup → review → config → event → results`, driven by the `phase` field in the
+Zustand store (src/state/store.ts) — no router. `App.tsx` switches screens on it. The store
+persists to localStorage key `ffl.v1` (crash recovery mid-event).
 
-**Core modules:**
+**Module boundaries (enforced by ESLint no-restricted-imports):**
 
-- **`lottery/`** — Simulation engine. `LotterySim` generates weighted chances from team records (worst record = most chances). `Simulator` implements the combinatorial lottery algorithm using 4-ball combinations mapped to team seeds via a hash table.
-- **`config/`** — `ConfigManager` is a **singleton** that loads/saves `config/league_config.json`. All modules access league data (owners, records, images, league name) through this singleton. `styles.py` contains all QSS stylesheet constants (primary color: `#013369` navy blue).
-- **`widgets/`** — PyQt5 UI components communicating via **signal/slot pattern**:
-  - `LotteryWindowWidget` emits `next_pick_clicked` → `MainWindow` runs lottery pick
-  - `DraftPickSelectorWidget` emits `pick_confirmed(position, owner_name)` → `MainWindow` updates draft order
-  - `ConfigWidget` opens as a separate window from Settings menu (Ctrl+,)
+- `src/engine/` — PURE: no React, no fetch, no `Math.random`/`Date.now`. Seedable mulberry32 RNG;
+  `oddsForLeagueSize()` adapts the NBA odds table (basis points, largest-remainder rounding) to
+  2–16 teams; `runLottery(config, seed, timestamp)` does weighted draws without replacement;
+  `replayLottery` verifies stored results.
+- `src/data/` — framework-free. `sleeper/client.ts` (typed fetch wrappers, `SleeperApiError`),
+  `sleeper/mapping.ts` (rosters+users join, playoff placements from bracket `p` games),
+  `ordering.ts` (`computeLotterySeeds`: regular-season or playoff ordering, worst first).
+- `src/screens/` + `src/components/` — UI. The event screen owns the reveal state machine
+  (idle → drumroll → revealed); reveals run worst pick → #1 pick.
 
-**Data flow:** ConfigManager loads JSON → LotterySim generates pick order → UI reveals picks one-by-one → each winner selects draft position → DraftOrderWidget updates.
+**Key invariants:**
 
-## Key Files
+- Odds basis points always sum to exactly 10000; team count 2–16.
+- The lottery result is computed up-front at "Start Lottery" (crypto-random seed); the event
+  screen is pure theater over a fixed result.
+- Store updates are immutable; the engine never mutates inputs.
 
-- `config/league_config.json` — League configuration (owners, records, images, league name)
-- `config/styles.py` — Centralized QSS stylesheets for all widgets
-- `build/fantasy_football_lottery.spec` — PyInstaller spec for executable builds
-- `data/` — Images (league logos, owner photos)
+## Testing
 
-## Dependencies
+- Engine: determinism, validation, Monte Carlo (seeded trials, 4σ binomial bounds — deterministic,
+  not flaky), exact 3-team closed-form distribution.
+- Data: fixture tests using real captured Sleeper responses (`src/data/sleeper/__fixtures__/`).
+- Screens: RTL with mocked Sleeper client / confetti / image export. EventScreen tests fake only
+  the `setTimeout` family — framer-motion needs real rAF in jsdom.
 
-Python 3.8+, PyQt5, numpy, pandas, PyInstaller (build only). Defined in `build/requirements.txt`.
+## Deployment
 
-## Notes
-
-- No test suite exists currently.
-- The app window defaults to 1920x1080.
-- File paths in the codebase use relative paths (e.g., `./config/`, `./data/`), so the app must be run from the project root.
+`.github/workflows/ci.yml`: lint → format:check → typecheck → test → build on PRs; pushes to
+`main` deploy `dist/` to GitHub Pages. `vite.config.ts` sets `base: '/fantasy-football-lottery/'`.
