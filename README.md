@@ -1,123 +1,65 @@
-# Fantasy Football Lottery
+# Fantasy Football Draft Lottery 🏈
 
-A professional draft lottery simulator for fantasy football leagues, built with PyQt5.
+A zero-install web app that runs a suspenseful, NBA-style draft lottery for your fantasy football
+league. Import your league from Sleeper (or enter it by hand), put it on the draft-night TV, and
+reveal the picks one agonizing card flip at a time.
 
-## Features
+**Live app:** https://amaryans.github.io/fantasy-football-lottery/
 
-- 🎲 **Lottery Simulation** - Weighted lottery based on previous season records
-- 📊 **Interactive Draft Selection** - Visual interface for selecting draft positions
-- ⚙️ **Configuration Management** - Easy-to-use settings interface
-- 💾 **Import/Export** - Save and share league configurations
-- 🎨 **Customizable** - Add league logos and owner images
-- 📦 **Standalone Executable** - No Python installation required for end users
+## How it works
 
-## Quick Start
+1. **Import your league** — paste a Sleeper league ID (or search by username), or enter owners and
+   records manually. A bundled sample league lets you try everything instantly.
+2. **Review and configure** — correct any team info, then choose how seeds are ordered (regular
+   season standings or playoff results) and how draft slots are claimed (winners pick their slot,
+   or lottery order = draft order).
+3. **Run the event** — worst pick first, with a drumroll, card-flip reveals, an extended finale for
+   the last three picks, and confetti for #1 overall. Keyboard-driven (Space = next, U = undo) so
+   the commissioner isn't fumbling with a mouse on the projector.
+4. **Share the results** — download or copy a results poster image for the league group chat.
 
-### For Users
+## Fairness
 
-See [USER_GUIDE.md](USER_GUIDE.md) for complete instructions on using the application.
+- Odds follow the **NBA lottery table** (14%, 14%, 14%, 12.5%, …), adapted exactly to any league
+  size from 2 to 16 teams. The worst team always gets the best odds.
+- Every result records its random **seed**, shown on the results poster — anyone can replay the
+  lottery with the same seed and get the identical order (`replayLottery` in
+  [src/engine/lottery.ts](src/engine/lottery.ts)).
+- The engine is validated by Monte Carlo tests (100k seeded trials per league size, 4σ bounds)
+  plus an exact closed-form check — see [src/engine](src/engine).
 
-### For Developers
+Everything runs client-side: no accounts, no server, and your league data never leaves the
+browser (state is kept in localStorage, so a mid-event page reload resumes exactly where you were).
 
-#### Running from Source
+## Development
+
 ```bash
-python main.py
+npm install
+npm run dev        # local dev server
+npm test           # engine + UI test suite
+npm run lint       # eslint
+npm run typecheck  # tsc
+npm run build      # production bundle in dist/
 ```
 
-#### Building Executable
-```bash
-cd build
-build.bat       # Windows
-python build.py # Cross-platform
-```
+Stack: Vite, React 18 + TypeScript (strict), Tailwind CSS, Zustand, framer-motion, Vitest.
 
-See [build/BUILD_README.md](build/BUILD_README.md) for detailed build instructions.
+### Architecture
 
-## Project Structure
+- `src/engine/` — pure, seedable lottery engine (no React, no network). NBA odds adaptation +
+  weighted draws without replacement.
+- `src/data/` — Sleeper API client, league mapping (records, avatars, playoff placements from the
+  bracket), and seed-ordering logic. Fixture-tested against real API responses.
+- `src/state/` — a single Zustand store: `setup → review → config → event → results` phase
+  machine, persisted to localStorage.
+- `src/screens/` + `src/components/` — one screen per phase; the event screen is the centerpiece.
 
-```
-fantasy-football-lottery/
-├── main.py                    # Application entry point
-├── config/                    # Configuration files
-│   ├── config_manager.py     # JSON config handler
-│   ├── league_config.json    # League settings
-│   └── styles.py             # Centralized stylesheets
-├── widgets/                   # UI components
-│   ├── config_widget.py      # Configuration interface
-│   ├── draft_order_widget.py # Draft order display
-│   ├── standings_widget.py   # Standings table
-│   └── ...
-├── lottery/                   # Lottery simulation logic
-│   ├── lottery.py            # Main lottery class
-│   └── lottery_simulator.py  # Simulation engine
-├── data/                      # Images and resources
-├── build/                     # Build scripts and config
-│   ├── build.bat             # Windows build script
-│   ├── build.py              # Cross-platform build
-│   ├── requirements.txt      # Python dependencies
-│   └── BUILD_README.md       # Build documentation
-├── USER_GUIDE.md             # End-user documentation
-└── README.md                 # This file
-```
+### Deployment
 
-## Requirements
+CI ([.github/workflows/ci.yml](.github/workflows/ci.yml)) lints, typechecks, tests, and builds on
+every PR; pushes to `main` deploy to GitHub Pages automatically. One-time repo setup: Settings →
+Pages → Source: **GitHub Actions**.
 
-- Python 3.8+
-- PyQt5
-- numpy
-- pandas
+## Legacy
 
-Install dependencies:
-```bash
-pip install -r build/requirements.txt
-```
-
-## Configuration
-
-The application uses JSON-based configuration stored in `config/league_config.json`:
-
-- League name and settings
-- Team information
-- Owner records and images
-- League logo
-
-Configuration can be managed through:
-- Built-in GUI (Settings → Configuration)
-- Direct JSON file editing
-- Import/Export functionality
-
-## Building for Distribution
-
-To create a standalone executable:
-
-1. Navigate to the build directory:
-   ```bash
-   cd build
-   ```
-
-2. Run the build script:
-   ```bash
-   build.bat       # Windows
-   python build.py # Cross-platform
-   ```
-
-3. Find the executable:
-   ```
-   dist/FantasyFootballLottery/FantasyFootballLottery.exe
-   ```
-
-See [build/BUILD_README.md](build/BUILD_README.md) for advanced build options.
-
-## Documentation
-
-- **[USER_GUIDE.md](USER_GUIDE.md)** - Complete user guide for end users
-- **[build/BUILD_README.md](build/BUILD_README.md)** - Build instructions and distribution
-- **[build/README.md](build/README.md)** - Quick reference for building
-
-## License
-
-MIT License - Feel free to use and modify for your fantasy league!
-
-## Version
-
-Current Version: 1.0
+The original PyQt5 desktop version of this app lives untouched in [legacy/](legacy/).
