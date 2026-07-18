@@ -30,6 +30,10 @@ export type SlotMode = 'winnerChoosesSlot' | 'lotteryIsOrder'
 export interface AppSettings {
   orderingSource: OrderingSource
   slotMode: SlotMode
+  /** Per-seed odds overrides in basis points (must sum to 10000); null = NBA table. */
+  customOddsBps: number[] | null
+  /** Per-seed pick floors: worst allowed pick per seed, null entries unprotected. */
+  pickFloors: (number | null)[] | null
 }
 
 export interface DraftSlotAssignment {

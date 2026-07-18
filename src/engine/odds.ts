@@ -41,7 +41,7 @@ export function oddsForLeagueSize(teamCount: number): number[] {
 }
 
 /** Scale weights so they sum to exactly BPS_TOTAL, via largest-remainder rounding. */
-function renormalizeToBps(weights: readonly number[]): number[] {
+export function renormalizeToBps(weights: readonly number[]): number[] {
   const total = weights.reduce((sum, w) => sum + w, 0)
   const exact = weights.map((w) => (w * BPS_TOTAL) / total)
   const floored = exact.map(Math.floor)

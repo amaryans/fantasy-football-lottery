@@ -9,6 +9,11 @@ export interface LotteryConfig {
   teams: LotteryTeam[]
   /** Odds in basis points per seed position; must sum to exactly 10000. */
   oddsBps: number[]
+  /**
+   * Optional per-seed pick floor: the worst pick that seed can receive
+   * (e.g. 4 = guaranteed a top-4 pick). Null entries are unprotected.
+   */
+  floors?: (number | null)[]
 }
 
 export interface LotteryResult {

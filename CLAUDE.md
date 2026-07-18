@@ -25,9 +25,17 @@ npx prettier --write src   # format
 
 ## Architecture
 
-**Phase flow:** `setup → review → config → event → results`, driven by the `phase` field in the
-Zustand store (src/state/store.ts) — no router. `App.tsx` switches screens on it. The store
-persists to localStorage key `ffl.v1` (crash recovery mid-event).
+**Phase flow:** `setup → review → config → event → results` (plus a free-standing `simulation`
+phase), driven by the `phase` field in the Zustand store (src/state/store.ts) — no router.
+`App.tsx` switches screens on it and wraps everything in NavBar + ErrorBoundary. The store
+persists to localStorage key `ffl.v1` (crash recovery mid-event); rehydration merges over
+defaults so stale snapshots can't blank the app.
+
+**Advanced lottery settings:** `AppSettings.customOddsBps` (per-seed odds overrides) and
+`pickFloors` (per-seed guaranteed worst pick, enforced in the engine via Hall's-condition
+validation + tight-set draw pools). `src/data/lotteryConfig.ts` is the single builder that
+turns league + settings into the engine config — used by startLottery, ConfigScreen, and
+SimulationScreen.
 
 **Module boundaries (enforced by ESLint no-restricted-imports):**
 
